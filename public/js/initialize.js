@@ -14,12 +14,6 @@ $(function() {
   $('#localVideo').draggable();
   $('#remoteVideos').draggable();
 
-
-
-
-
-
-
   if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
 
     // **Touch Events**
@@ -107,7 +101,6 @@ $(function() {
     });
   } else {
     // **Mouse Events**
-
     // On mousedown detection, initialize drawing properties based on mouse coordinates.
     App.canvas.on('mousedown', function(e) {
 

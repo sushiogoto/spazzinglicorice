@@ -54,7 +54,7 @@ h1 {
 }
 
 
-.whiteboard.container { 
+.whiteboard.container {
   background-color: #fff;
   /*position: relative;*/
 /*  margin: 10% 10%;
@@ -114,6 +114,13 @@ h1 {
  font-size: 13px;
  text-decoration: none;
  vertical-align: middle;
+}
+
+#editBox {
+  height: 200px;
+  width: 200px;
+  border-style: solid;
+  border-color: black;
 }
 
 div.btn-erase {
