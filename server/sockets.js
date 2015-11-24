@@ -25,6 +25,31 @@ var connect = function(boardUrl, board, io) {
       };
     });
 
+    socket.on('rewind', function(value) {
+
+      //Get the board that the socket is connected to.
+
+      var id = socket.nsp.name.slice(1);
+
+      //find the current board
+
+      Board.boardModel.findOne({id: id}, function(err, board) {
+        if (err) {console.error(err);}
+        //send rewind intent and board back to all users in room
+        whiteboard.emit('rewind', board, value);
+      });
+    })
+
+    socket.on('clear', function() {
+      //Get the board that the socket is connected to.
+      var id = socket.nsp.name.slice(1);
+      //remove all data associated with board from DB
+      Board.boardModel.remove({id:id}, function(err, data) {
+        // Tell all associated boards to clear themselves
+        whiteboard.emit('clearDone', null);
+      })
+    })
+
     socket.on('drag', function(coords) {
       //Push coordinates into the stroke's drawing path.
       socket.stroke.path.push(coords);
@@ -39,26 +64,102 @@ var connect = function(boardUrl, board, io) {
       socket.broadcast.emit('drag', payload);
     });
 
-    //When stroke is finished, add it to our db.
-    socket.on('end', function() {
-      var finishedStroke = socket.stroke;
-
+    socket.on('type', function(textBoxInfo) {
       //Get the board that the socket is connected to.
       var id = socket.nsp.name.slice(1);
 
-      //Update the board with the new stroke.
-      Board.boardModel.update({id: id},{$push: {strokes: finishedStroke} },{upsert:true},function(err, board){
+
+      //Update the board with the new textbox info.
+
+      Board.boardModel.update({id: id},{$push: {strokes: textBoxInfo} },{upsert:true},function(err, board){
         if(err){ console.log(err); }
         else {
           console.log("Successfully added");
         }
       });
 
-      // Emit end event to everyone but the person who stopped drawing.
-      socket.broadcast.emit('end', null);
+      // Emit end event to everyone but the person who stopped typing.
 
-      //Delete the stroke object to make room for the next stroke.
+      socket.broadcast.emit('endText', textBoxInfo);
       delete socket.stroke;
+    })
+
+    socket.on('endText', function(textBoxInfo) {
+      //Get the board that the socket is connected to.
+      var id = socket.nsp.name.slice(1);
+
+      //Update the board with the new textbox info.
+
+      Board.boardModel.update({id: id},{$push: {strokes: textBoxInfo} },{upsert:true},function(err, board){
+        if(err){ console.log(err); }
+        else {
+          console.log("Successfully added");
+        }
+      });
+
+      // Emit end event to everyone but the person who stopped typing.
+
+      socket.broadcast.emit('endText', textBoxInfo);
+      delete socket.stroke;
+
+    })
+
+    // undo
+    socket.on('undo', function() {
+      //Get the board that the socket is connected to.
+      var id = socket.nsp.name.slice(1);
+
+       Board.boardModel.update({id: id},{$pop: {strokes: 1} },function(err, board){
+          if(err){ console.log(err); }
+          else {
+            Board.boardModel.findOne({id: id}, function(err, board) {
+            // send undo event to all boards
+            //TODO add error handling
+              whiteboard.emit('undo', board);
+              console.log("Successfully performed undo");
+            })
+
+          }
+        });
+
+
+    });
+
+    socket.on('refresh', function() {
+      var id = socket.nsp.name.slice(1);
+
+      Board.boardModel.findOne({id: id}, function(err, board) {
+        if (err) {console.error(err);}
+        //send rewind intent and board back to all users in room
+        whiteboard.emit('refresh', board);
+      });
+
+    });
+
+    //When stroke is finished, add it to our db.
+    socket.on('end', function(data) {
+      //Get the board that the socket is connected to.
+      var id = socket.nsp.name.slice(1);
+
+        var finishedStroke = socket.stroke;
+        // check for null data (TODO: make sure this check doesn't cause any other bugs)
+        if (finishedStroke) {
+          //Update the board with the new stroke.
+          Board.boardModel.update({id: id},{$push: {strokes: finishedStroke} },{upsert:true},function(err, board){
+            if(err){ console.log(err); }
+            else {
+              console.log("Successfully added");
+            }
+          });
+
+
+        // Emit end event to everyone but the person who stopped drawing.
+        socket.broadcast.emit('end', null);
+
+        //Delete the stroke object to make room for the next stroke.
+        delete socket.stroke;
+
+        }
     });
   });
 };

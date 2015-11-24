@@ -313,6 +313,18 @@ label[for=blue] {
   background: darkblue;
 }
 
+.palette #white:not(:checked) + label:after {
+  background: white;
+}
+
+.palette #cyan:not(:checked) + label:after {
+  background: cyan;
+}
+
+.palette #purple:not(:checked) + label:after {
+  background: purple;
+}
+
 
 
 
