@@ -11,12 +11,22 @@ angular.module('whiteboard', ['ui.router'])
         controller: 'toolbar'
       });
   })
-  // Set App to the root scope. 
+  // Set App to the root scope.
   .controller('canvas', function($rootScope, $scope, tools) {
     $rootScope.app = App;
   })
+  .controller('whiteboardInput', function($scope, $location, Boards) {
+    var path = $location.$$absUrl.split('/')[2];
+    Boards.getBoard(path).then(function (resp) {
+      $scope.boardName = resp.data.name;
+    });
 
-// Set toolbar for colour palette and eraser. 
+    $scope.submitBoardName = function (name, boardId) {
+      Boards.postBoardName(name, path);
+    };
+  })
+
+// Set toolbar for colour palette and eraser.
 .controller('toolbar', function($scope, $element, tools) {
   $scope.changePen = function(option) {
     tools.changePen(option);
@@ -34,7 +44,7 @@ angular.module('whiteboard', ['ui.router'])
 })
 
 // Set changePen method.
-// Note that an eraser is simply a white pen, not actually erasing [x,y] tuples from the database. 
+// Note that an eraser is simply a white pen, not actually erasing [x,y] tuples from the database.
 .service('tools', function($rootScope) {
   var changePen = function(option) {
     if (option === 'eraser') {

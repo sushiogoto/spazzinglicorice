@@ -137,7 +137,7 @@ App.init = function() {
   // Draw the board upon join.
   App.socket.on('join', function(board) {
     console.log("Joining the board.");
-
+    App.board = board;
     // Check for null board data.
     if (board) {
       for (var i = 0; i < board.strokes.length; i++) {

@@ -15,7 +15,7 @@
     <video id="localVideo"></video>
     <div id="remoteVideos"></div>
 
-    <nav class="navbar navbar-default">
+    <nav class="navbar navbar-default" ng-controller="whiteboardInput">
       <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
@@ -33,6 +33,12 @@
           <ul class="nav navbar-nav">
             <li class="active"><a href="/boards">Boards</a></li>
             <li><a href="#">About</a></li>
+          </ul>
+          <ul class="nav navbar-nav center">
+            <li class="title">
+              <input class="title-text" type="text" ng-if="!boardName" ng-model="board.boardName" ng-submit="submitBoardName(board.boardName)">
+              <h3 ng-if="boardName">{{ boardName }}</h3>
+            </li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <li><a href="/signout">Signout</a></li>
