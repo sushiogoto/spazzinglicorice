@@ -65,7 +65,8 @@ angular.module('services', [])
   return {
     getAll: getAll,
     getNew: getNew,
-    getBoard: getBoard
+    getBoard: getBoard,
+    postBoardName: postBoardName
   };
 
 });

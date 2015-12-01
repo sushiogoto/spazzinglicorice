@@ -4,7 +4,7 @@
 
 // Initialize the whiteboard module.
 
-angular.module('whiteboard', ['ui.router'])
+angular.module('whiteboard', ['ui.router', 'services'])
   .config(function($stateProvider) {
     $stateProvider
       .state('eraser', {
@@ -16,8 +16,10 @@ angular.module('whiteboard', ['ui.router'])
     $rootScope.app = App;
   })
   .controller('whiteboardInput', function($scope, $location, Boards) {
+    $scope.board = {};
     var path = $location.$$absUrl.split('/')[2];
     Boards.getBoard(path).then(function (resp) {
+      debugger;
       $scope.boardName = resp.data.name;
     });
 
